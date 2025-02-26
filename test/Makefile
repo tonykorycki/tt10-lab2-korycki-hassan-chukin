@@ -1,48 +1,44 @@
-# Defaults
+# Makefile
+# See https://docs.cocotb.org/en/stable/quickstart.html for more info
+
+# defaults
 SIM ?= icarus
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(PWD)/../src
-TEST_DIR = $(PWD)/test
+PROJECT_SOURCES = project.v
 
-# Verilog source files
-PROJECT_SOURCES = project.v priority_encoder.v bitwise_majority.v
-
-# Testbenches
-TESTBENCHES = tb_project.v tb_priority_encoder.v tb_bitwise_majority.v
-
-# Check if we are running gate-level simulation
 ifneq ($(GATES),yes)
-    # RTL simulation
-    SIM_BUILD = sim_build/rtl
-    VERILOG_SOURCES += $(addprefix $(SRC_DIR)/,$(PROJECT_SOURCES))
+
+# RTL simulation:
+SIM_BUILD				= sim_build/rtl
+VERILOG_SOURCES += $(addprefix $(SRC_DIR)/,$(PROJECT_SOURCES))
+
 else
-    # Gate-level simulation
-    SIM_BUILD = sim_build/gl
-    COMPILE_ARGS += -DGL_TEST -DFUNCTIONAL -DUSE_POWER_PINS -DSIM -DUNIT_DELAY=\#1
-    VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/primitives.v
-    VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v
-    VERILOG_SOURCES += $(PWD)/gate_level_netlist.v
+
+# Gate level simulation:
+SIM_BUILD				= sim_build/gl
+COMPILE_ARGS    += -DGL_TEST
+COMPILE_ARGS    += -DFUNCTIONAL
+COMPILE_ARGS    += -DUSE_POWER_PINS
+COMPILE_ARGS    += -DSIM
+COMPILE_ARGS    += -DUNIT_DELAY=\#1
+VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/primitives.v
+VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v
+
+# this gets copied in by the GDS action workflow
+VERILOG_SOURCES += $(PWD)/gate_level_netlist.v
+
 endif
 
-# Include testbench sources
-VERILOG_SOURCES += $(addprefix $(TEST_DIR)/,$(TESTBENCHES))
+# Allow sharing configuration between design and testbench via `include`:
+COMPILE_ARGS 		+= -I$(SRC_DIR)
 
-# Set top-level module
-TOPLEVEL = tb_project  # Default, will be overridden per test
+# Include the testbench sources:
+VERILOG_SOURCES += $(PWD)/tb.v
+TOPLEVEL = tb
+
+# MODULE is the basename of the Python test file
 MODULE = test
 
-# Define test targets
-test_project:
-	$(MAKE) SIM=$(SIM) TOPLEVEL=tb MODULE=test PROJECT_SOURCES=project.v run
-
-test_priority_encoder:
-	$(MAKE) SIM=$(SIM) TOPLEVEL=tb_priority_encoder MODULE=test PROJECT_SOURCES=priority_encoder.v run
-
-test_bitwise_majority:
-	$(MAKE) SIM=$(SIM) TOPLEVEL=tb_bitwise_majority MODULE=test PROJECT_SOURCES=bitwise_majority.v run
-
-# Run all tests
-test_all: test_project test_priority_encoder test_bitwise_majority
-
-# Include cocotb’s make rules
+# include cocotb's make rules to take care of the simulator setup
 include $(shell cocotb-config --makefiles)/Makefile.sim
