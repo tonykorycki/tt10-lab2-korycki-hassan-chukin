@@ -37,4 +37,7 @@ async def test_priority_encoder(dut):
         await RisingEdge(dut.clk)
         await FallingEdge(dut.clk)
         result = int(dut.uo_out.value)
+        dut._log.info(f"Input: {input_val:016b}, Expected: {expected}, Got: {result}")
         assert result == expected, f"Expected {expected}, got {result} for input {input_val:016b}"
+
+    dut._log.info("All tests passed!")
