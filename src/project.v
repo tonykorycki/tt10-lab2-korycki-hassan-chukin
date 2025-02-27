@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2024 Your Name
- * SPDX-License-Identifier: Apache-2.0
- */
 `default_nettype none
 module tt_um_KHC_module (
     input  wire [7:0] ui_in,    // Lower 8 bits (B[7:0])
@@ -18,33 +14,32 @@ module tt_um_KHC_module (
     
     // Priority encoder logic
     always @(*) begin
-        // Default case: If no bits are set, output 0xF0
-        uo_out = 8'b1111_0000;
-        
-        // Check bits from MSB to LSB
-        if (combined_input[15]) uo_out = 8'd15;
-        else if (combined_input[14]) uo_out = 8'd14;
-        else if (combined_input[13]) uo_out = 8'd13;
-        else if (combined_input[12]) uo_out = 8'd12;
-        else if (combined_input[11]) uo_out = 8'd11;
-        else if (combined_input[10]) uo_out = 8'd10;
-        else if (combined_input[9]) uo_out = 8'd9;
-        else if (combined_input[8]) uo_out = 8'd8;
-        else if (combined_input[7]) uo_out = 8'd7;
-        else if (combined_input[6]) uo_out = 8'd6;
-        else if (combined_input[5]) uo_out = 8'd5;
-        else if (combined_input[4]) uo_out = 8'd4;
-        else if (combined_input[3]) uo_out = 8'd3;
-        else if (combined_input[2]) uo_out = 8'd2;
-        else if (combined_input[1]) uo_out = 8'd1;
-        else if (combined_input[0]) uo_out = 8'd0;
-        // Default case already set at the beginning
+        casez (combined_input)
+            16'b1???????????????: uo_out = 8'd15;
+            16'b01??????????????: uo_out = 8'd14;
+            16'b001?????????????: uo_out = 8'd13;
+            16'b0001????????????: uo_out = 8'd12;
+            16'b00001???????????: uo_out = 8'd11;
+            16'b000001??????????: uo_out = 8'd10;
+            16'b0000001?????????: uo_out = 8'd9;
+            16'b00000001????????: uo_out = 8'd8;
+            16'b000000001???????: uo_out = 8'd7;
+            16'b0000000001??????: uo_out = 8'd6;
+            16'b00000000001?????: uo_out = 8'd5;
+            16'b000000000001????: uo_out = 8'd4;
+            16'b0000000000001???: uo_out = 8'd3;
+            16'b00000000000001??: uo_out = 8'd2;
+            16'b000000000000001?: uo_out = 8'd1;
+            16'b0000000000000001: uo_out = 8'd0;
+            16'b0000000000000000: uo_out = 8'b11110000;
+            default: uo_out = 8'b11110000; // This should never happen
+        endcase
     end
     
     // Assign remaining outputs
     assign uio_out = 8'b0;  // Not used
     assign uio_oe = 8'b0;   // Set as inputs
     
-    // Handle unused inputs - fixed the syntax error in rst_n reference
+    // Handle unused inputs
     wire unused = &{ena, clk, rst_n, 1'b0};
 endmodule
