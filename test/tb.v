@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-module tb_bitwise_majority;
+module tb;
     reg [7:0] A, B;
     wire [7:0] C;
     
