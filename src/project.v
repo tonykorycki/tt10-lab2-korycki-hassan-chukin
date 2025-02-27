@@ -44,4 +44,12 @@ module tt_um_KHC_module (
     end
   end
   
-  //
+  // Assign outputs
+  assign uo_out = encoder_output;
+  assign uio_out = 8'h00;
+  assign uio_oe = 8'hFF;  // Set all pins to output mode
+  
+  // List all unused inputs to prevent warnings
+  wire _unused = &{ena, clk, rst_n, 1'b0};
+
+endmodule
