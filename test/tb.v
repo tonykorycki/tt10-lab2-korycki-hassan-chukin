@@ -1,21 +1,42 @@
+`default_nettype none
 `timescale 1ns / 1ps
+
 module tb ();
-    reg [7:0] A, B;
-    wire [7:0] C;
-    
-    tt_um_KHC_module user_projet (
-        .A(A),
-        .B(B),
-        .C(C)
-    );
+  // Dump the signals to a VCD file
+  initial begin
+    $dumpfile("tb.vcd");
+    $dumpvars(0, tb);
+    #1;
+  end
+  
+  // Wire up the inputs and outputs:
+  reg clk;
+  reg rst_n;
+  reg ena;
+  reg [7:0] ui_in;
+  reg [7:0] uio_in;
+  wire [7:0] uo_out;
+  wire [7:0] uio_out;
+  wire [7:0] uio_oe;
 
-    initial begin
-        $dumpfile("tb_bitwise_majority.vcd");
-        $dumpvars(0, tb_bitwise_majority);
+`ifdef GL_TEST
+  wire VPWR = 1'b1;
+  wire VGND = 1'b0;
+`endif
 
-        A = 8'b11001010; B = 8'b01100011; #10;
-        A = 8'b10101010; B = 8'b01010101; #10;
-
-        $finish;
-    end
+  // Instantiate the module
+  tt_um_KHC_module user_project (
+`ifdef GL_TEST
+      .VPWR(VPWR),
+      .VGND(VGND),
+`endif
+      .ui_in  (ui_in),    // A input
+      .uo_out (uo_out),   // C output
+      .uio_in (uio_in),   // B input
+      .uio_out(uio_out),  // Not used
+      .uio_oe (uio_oe),   // Not used
+      .ena    (ena),      // enable
+      .clk    (clk),      // clock
+      .rst_n  (rst_n)     // not reset
+  );
 endmodule
