@@ -17,7 +17,7 @@ module tt_um_KHC_module (
         for (i = 15; i >= 0; i = i - 1) begin
             if (combined_input[i]) begin
                 uo_out = i[7:0];
-                break;
+                i = -1; // Exit the loop
             end
         end
     end
