@@ -1,6 +1,6 @@
 `default_nettype none
 
-module tt_um_priority_encoder (
+module tt_um_KHC_module (
     input  wire [7:0] ui_in,    // First 8 bits (B[7:0])
     output wire [7:0] uo_out,   // Output C[7:0]
     input  wire [7:0] uio_in,   // Second 8 bits (A[7:0])
@@ -44,4 +44,4 @@ module tt_um_priority_encoder (
     end
   end
   
-  // Assign out
+  //
